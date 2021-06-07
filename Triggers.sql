@@ -23,6 +23,46 @@ CREATE TABLE EmployeesAudit
     )
 GO
 
+-- Trigger
+
+CREATE TRIGGER TR_Audit_Employees on dbo.Employees
+
+  For Insert
+
+AS
+  DECLARE @login_name varchar(128)
+  select @login_name=login_name
+  from sys.dm_exec_sessions
+  where session_id=@@SPID
+
+ -- select @@SPID
+ Begin
+
+  
+
+INSERT INTO [dbo].[EmployeesAudit]
+           ([EmployeeID]
+           ,[EmployeeName]
+           ,[EmployeeAddress]
+           ,[MonthSalary]
+           ,[ModifiedBy]
+           ,[ModifiedDate]
+           ,[Operation])
+     select I.EmployeeID,
+	 I.EmployeeName,
+	 I.EmployeeAddress,
+	 I.MonthSalary,
+	 @login_name,
+	 GETDATE(),
+	 'I'
+	 from inserted I
+
+	 END
+
+
+
+--- Test
+
 BEGIN TRANSACTION
 INSERT  INTO dbo.Employees
         ( EmployeeName ,
