@@ -22,3 +22,22 @@ CREATE TABLE EmployeesAudit
       PRIMARY KEY CLUSTERED ( AuditID )
     )
 GO
+
+BEGIN TRANSACTION
+INSERT  INTO dbo.Employees
+        ( EmployeeName ,
+          EmployeeAddress ,
+          MonthSalary
+        )
+        SELECT  'zz' ,
+                'dsda' ,
+                10000
+        UNION ALL
+        SELECT  'Essaoud Zeineb' ,
+                'Lac 3' ,
+                6000
+SELECT  *
+FROM    dbo.Employees
+SELECT  *
+FROM    dbo.EmployeesAudit
+ROLLBACK TRANSACTION
