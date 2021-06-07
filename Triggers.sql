@@ -112,6 +112,27 @@ INSERT INTO [dbo].[EmployeesAudit]
 --- Test
 
 BEGIN TRANSACTION
+SELECT  *
+FROM    dbo.Employees
+WHERE   EmployeeID = 1
+ 
+UPDATE  Employees
+SET     EmployeeName = 'zzz'
+WHERE   EmployeeID = 1
+ 
+SELECT  *
+FROM    dbo.Employees
+WHERE   EmployeeID = 1
+ 
+SELECT  *
+FROM    dbo.EmployeesAudit
+ROLLBACK TRANSACTION
+
+
+
+
+
+BEGIN TRANSACTION
 INSERT  INTO dbo.Employees
         ( EmployeeName ,
           EmployeeAddress ,
