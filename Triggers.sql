@@ -25,9 +25,13 @@ GO
 
 -- Trigger
 
-CREATE TRIGGER TR_Audit_Employees on dbo.Employees
+/****** Script de la commande SelectTopNRows à partir de SSMS  ******/
+ 
 
-  For Insert
+
+  Alter TRIGGER TR_Audit_Employees on dbo.Employees
+
+  For Insert, Update,delete
 
 AS
   DECLARE @login_name varchar(128)
@@ -37,8 +41,52 @@ AS
 
  -- select @@SPID
  Begin
+ If Exists(select 0 from deleted)
+    Begin
+     If Exists(select 0 from inserted)
+	 begin
+	 INSERT INTO [dbo].[EmployeesAudit]
+           ([EmployeeID]
+           ,[EmployeeName]
+           ,[EmployeeAddress]
+           ,[MonthSalary]
+           ,[ModifiedBy]
+           ,[ModifiedDate]
+           ,[Operation])
+     select 
+	 D.EmployeeID,
+	 D.EmployeeName,
+	 D.EmployeeAddress,
+	 D.MonthSalary,
+	 @login_name,
+	 GETDATE(),
+	 'U'
+	 from deleted D -- Updated
+	 End
+	 Else
+	 Begin
+	 INSERT INTO [dbo].[EmployeesAudit]
+           ([EmployeeID]
+           ,[EmployeeName]
+           ,[EmployeeAddress]
+           ,[MonthSalary]
+           ,[ModifiedBy]
+           ,[ModifiedDate]
+           ,[Operation])
+     select 
+	 D.EmployeeID,
+	 D.EmployeeName,
+	 D.EmployeeAddress,
+	 D.MonthSalary,
+	 @login_name,
+	 GETDATE(),
+	 'D'
+	 from deleted D
+	 End
 
-  
+ End
+  Else 
+  Begin
 
 INSERT INTO [dbo].[EmployeesAudit]
            ([EmployeeID]
@@ -56,10 +104,10 @@ INSERT INTO [dbo].[EmployeesAudit]
 	 GETDATE(),
 	 'I'
 	 from inserted I
+	 End
+	 
 
-	 END
-
-
+	 End
 
 --- Test
 
